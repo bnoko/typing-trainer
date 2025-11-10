@@ -130,16 +130,18 @@ Access settings by pressing **S** or clicking the ⚙️ icon.
 |---------|-------|---------|-------------|
 | **Test Length** | 1-200 chars | 40 | Number of characters per test |
 | **New Char Frequency** | 1-10× | 4× | How much more often new characters appear |
-| **Lives per Level** | 1-5 | 3 | Number of attempts before dropping a level |
+| **Lives per Level** | 1-10 | 3 | Number of attempts before dropping a level |
 | **Target WPM** | 0-100 | 10 | Minimum WPM to advance (0 = no time limit) |
 | **Accuracy Threshold** | 0-100% | 95% | Minimum accuracy to avoid losing a life |
 | **Level Selector** | Any level | 1 | Jump to any level for practice |
 
 **Applying Settings:**
-- After changing settings, click **Apply Settings** (or press **Enter**) to apply changes
-- The Apply button is always visible at the bottom of the settings panel
+- When you first open settings, you can close freely with the **Close** button
+- After making any changes, the **Apply Settings** and **Cancel Changes** buttons appear
+- Click **Apply Settings** (or press **Enter**) to save and apply changes
+- Click **Cancel Changes** (or press **Esc**) to discard changes and revert to saved settings
 - If a test is active, applying settings will restart it with the new configuration
-- Settings are automatically saved to browser localStorage and persist across sessions
+- Settings are automatically saved to browser localStorage when applied and persist across sessions
 
 ## File Structure
 
