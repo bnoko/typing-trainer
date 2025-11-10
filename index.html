@@ -1387,7 +1387,10 @@
 
         function openSettings() {
             // Initialize pending settings with current values
-            state.pendingSettings = { ...state.settings };
+            state.pendingSettings = {
+                ...state.settings,
+                currentLevel: state.currentLevel  // Track pending level changes too
+            };
             document.getElementById('settingsPanel').classList.add('open');
             updateSettingsUI();
             updateSettingsButtonVisibility();
@@ -1423,8 +1426,21 @@
         function applySettings() {
             if (!state.pendingSettings) return;
 
-            // Apply all pending changes
-            state.settings = { ...state.pendingSettings };
+            // Apply level change if it was modified
+            if (state.pendingSettings.currentLevel !== undefined) {
+                state.currentLevel = state.pendingSettings.currentLevel;
+            }
+
+            // Apply all pending settings changes
+            state.settings = {
+                testLength: state.pendingSettings.testLength,
+                newCharFreq: state.pendingSettings.newCharFreq,
+                maxLives: state.pendingSettings.maxLives,
+                targetWpm: state.pendingSettings.targetWpm,
+                accuracyThreshold: state.pendingSettings.accuracyThreshold,
+                darkMode: state.pendingSettings.darkMode
+            };
+
             state.currentLives = state.settings.maxLives;
             updateInfoBar();
             saveState();
@@ -1471,6 +1487,9 @@
             const selector = document.getElementById('levelSelector');
             selector.innerHTML = '';
 
+            // Use pending level if available (when panel is open), otherwise use current level
+            const currentLevel = state.pendingSettings?.currentLevel ?? state.currentLevel;
+
             // Show all levels (all 26 letters + punctuation + numbers + extended)
             const totalLevels = CHAR_PROGRESSION.length;
             for (let i = 1; i <= totalLevels; i++) {
@@ -1478,7 +1497,7 @@
                 option.value = i;
                 const chars = getAvailableChars(i);
                 option.textContent = `Level ${i}: ${chars.join(' ').toUpperCase()}`;
-                if (i === state.currentLevel) option.selected = true;
+                if (i === currentLevel) option.selected = true;
                 selector.appendChild(option);
             }
         }
@@ -1566,11 +1585,9 @@
         });
 
         document.getElementById('levelSelector').addEventListener('change', (e) => {
-            // Level selector applies immediately (not part of pending changes)
-            state.currentLevel = parseInt(e.target.value);
-            state.currentLives = state.settings.maxLives;
-            updateInfoBar();
-            saveState();
+            if (!state.pendingSettings) return;
+            state.pendingSettings.currentLevel = parseInt(e.target.value);
+            updateSettingsButtonVisibility();
         });
 
         // Keyboard shortcuts
