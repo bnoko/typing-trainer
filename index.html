@@ -817,9 +817,17 @@
         </div>
 
         <div class="settings-footer">
-            <button id="applySettingsBtn" style="width: 100%;">
-                Apply Settings <span class="kbd">Enter</span>
+            <button id="closeSettingsBtn2" class="secondary" style="width: 100%;">
+                Close <span class="kbd">Esc</span>
             </button>
+            <div id="settingsActions" style="display: none;">
+                <button id="applySettingsBtn" style="width: 100%; margin-bottom: 0.75rem;">
+                    Apply Settings <span class="kbd">Enter</span>
+                </button>
+                <button id="cancelSettingsBtn" class="secondary" style="width: 100%;">
+                    Cancel Changes <span class="kbd">Esc</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -933,6 +941,7 @@
                 accuracyThreshold: 95,
                 darkMode: false
             },
+            pendingSettings: null, // Tracks unsaved changes
             test: {
                 text: '',
                 userInput: '',
@@ -1377,16 +1386,49 @@
         // ============================================================================
 
         function openSettings() {
+            // Initialize pending settings with current values
+            state.pendingSettings = { ...state.settings };
             document.getElementById('settingsPanel').classList.add('open');
             updateSettingsUI();
+            updateSettingsButtonVisibility();
         }
 
         function closeSettings() {
             document.getElementById('settingsPanel').classList.remove('open');
+            state.pendingSettings = null;
+        }
+
+        function hasUnsavedChanges() {
+            if (!state.pendingSettings) return false;
+            return JSON.stringify(state.pendingSettings) !== JSON.stringify(state.settings);
+        }
+
+        function updateSettingsButtonVisibility() {
+            const hasChanges = hasUnsavedChanges();
+            const closeBtn = document.getElementById('closeSettingsBtn2');
+            const actionsDiv = document.getElementById('settingsActions');
+            const headerCloseBtn = document.getElementById('closeSettingsBtn');
+
+            if (hasChanges) {
+                closeBtn.style.display = 'none';
+                actionsDiv.style.display = 'block';
+                headerCloseBtn.style.display = 'none';
+            } else {
+                closeBtn.style.display = 'block';
+                actionsDiv.style.display = 'none';
+                headerCloseBtn.style.display = 'block';
+            }
         }
 
         function applySettings() {
-            // Settings are already saved via event listeners, so just close and restart if needed
+            if (!state.pendingSettings) return;
+
+            // Apply all pending changes
+            state.settings = { ...state.pendingSettings };
+            state.currentLives = state.settings.maxLives;
+            updateInfoBar();
+            saveState();
+
             closeSettings();
 
             // If currently on training screen (not welcome), restart the test with new settings
@@ -1394,6 +1436,13 @@
             if (activeScreen && activeScreen.id === 'trainingScreen') {
                 startTest();
             }
+        }
+
+        function cancelSettings() {
+            // Revert UI to current saved settings
+            updateSettingsUI();
+            state.pendingSettings = { ...state.settings };
+            updateSettingsButtonVisibility();
         }
 
         function updateSettingsUI() {
@@ -1472,43 +1521,49 @@
 
         document.getElementById('settingsBtn').addEventListener('click', openSettings);
         document.getElementById('closeSettingsBtn').addEventListener('click', closeSettings);
+        document.getElementById('closeSettingsBtn2').addEventListener('click', closeSettings);
         document.getElementById('applySettingsBtn').addEventListener('click', applySettings);
+        document.getElementById('cancelSettingsBtn').addEventListener('click', cancelSettings);
         document.getElementById('darkModeBtn').addEventListener('click', toggleDarkMode);
 
-        // Settings sliders
+        // Settings sliders - update pending settings, not actual settings
         document.getElementById('testLengthSlider').addEventListener('input', (e) => {
-            state.settings.testLength = parseInt(e.target.value);
-            document.getElementById('testLengthValue').textContent = state.settings.testLength;
-            saveState();
+            if (!state.pendingSettings) return;
+            state.pendingSettings.testLength = parseInt(e.target.value);
+            document.getElementById('testLengthValue').textContent = state.pendingSettings.testLength;
+            updateSettingsButtonVisibility();
         });
 
         document.getElementById('newCharFreqSlider').addEventListener('input', (e) => {
-            state.settings.newCharFreq = parseInt(e.target.value);
-            document.getElementById('newCharFreqValue').textContent = state.settings.newCharFreq;
-            saveState();
+            if (!state.pendingSettings) return;
+            state.pendingSettings.newCharFreq = parseInt(e.target.value);
+            document.getElementById('newCharFreqValue').textContent = state.pendingSettings.newCharFreq;
+            updateSettingsButtonVisibility();
         });
 
         document.getElementById('livesSlider').addEventListener('input', (e) => {
-            state.settings.maxLives = parseInt(e.target.value);
-            document.getElementById('livesValue').textContent = state.settings.maxLives;
-            state.currentLives = state.settings.maxLives;
-            updateInfoBar();
-            saveState();
+            if (!state.pendingSettings) return;
+            state.pendingSettings.maxLives = parseInt(e.target.value);
+            document.getElementById('livesValue').textContent = state.pendingSettings.maxLives;
+            updateSettingsButtonVisibility();
         });
 
         document.getElementById('targetWpmSlider').addEventListener('input', (e) => {
-            state.settings.targetWpm = parseInt(e.target.value);
-            document.getElementById('targetWpmValue').textContent = state.settings.targetWpm;
-            saveState();
+            if (!state.pendingSettings) return;
+            state.pendingSettings.targetWpm = parseInt(e.target.value);
+            document.getElementById('targetWpmValue').textContent = state.pendingSettings.targetWpm;
+            updateSettingsButtonVisibility();
         });
 
         document.getElementById('accuracyThresholdSlider').addEventListener('input', (e) => {
-            state.settings.accuracyThreshold = parseInt(e.target.value);
-            document.getElementById('accuracyThresholdValue').textContent = state.settings.accuracyThreshold;
-            saveState();
+            if (!state.pendingSettings) return;
+            state.pendingSettings.accuracyThreshold = parseInt(e.target.value);
+            document.getElementById('accuracyThresholdValue').textContent = state.pendingSettings.accuracyThreshold;
+            updateSettingsButtonVisibility();
         });
 
         document.getElementById('levelSelector').addEventListener('change', (e) => {
+            // Level selector applies immediately (not part of pending changes)
             state.currentLevel = parseInt(e.target.value);
             state.currentLives = state.settings.maxLives;
             updateInfoBar();
@@ -1525,11 +1580,19 @@
             if (settingsOpen) {
                 if (e.key === 'Escape') {
                     e.preventDefault();
-                    closeSettings();
+                    // If there are unsaved changes, cancel them. Otherwise, close settings.
+                    if (hasUnsavedChanges()) {
+                        cancelSettings();
+                    } else {
+                        closeSettings();
+                    }
                     return;
                 } else if (e.key === 'Enter') {
                     e.preventDefault();
-                    applySettings();
+                    // Only apply if there are changes to apply
+                    if (hasUnsavedChanges()) {
+                        applySettings();
+                    }
                     return;
                 }
             }
