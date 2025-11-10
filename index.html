@@ -801,6 +801,12 @@
             <div class="setting-description">Select any level to practice</div>
             <select id="levelSelector"></select>
         </div>
+
+        <div class="setting-group">
+            <button id="applySettingsBtn" style="width: 100%;">
+                Apply Settings <span class="kbd">Enter</span>
+            </button>
+        </div>
     </div>
 
     <script>
@@ -1365,6 +1371,17 @@
             document.getElementById('settingsPanel').classList.remove('open');
         }
 
+        function applySettings() {
+            // Settings are already saved via event listeners, so just close and restart if needed
+            closeSettings();
+
+            // If currently on training screen (not welcome), restart the test with new settings
+            const activeScreen = document.querySelector('.screen.active');
+            if (activeScreen && activeScreen.id === 'trainingScreen') {
+                startTest();
+            }
+        }
+
         function updateSettingsUI() {
             document.getElementById('testLengthSlider').value = state.settings.testLength;
             document.getElementById('testLengthValue').textContent = state.settings.testLength;
@@ -1441,6 +1458,7 @@
 
         document.getElementById('settingsBtn').addEventListener('click', openSettings);
         document.getElementById('closeSettingsBtn').addEventListener('click', closeSettings);
+        document.getElementById('applySettingsBtn').addEventListener('click', applySettings);
         document.getElementById('darkModeBtn').addEventListener('click', toggleDarkMode);
 
         // Settings sliders
@@ -1490,10 +1508,16 @@
             const isTraining = activeScreen && activeScreen.id === 'trainingScreen';
             const settingsOpen = document.getElementById('settingsPanel').classList.contains('open');
 
-            if (settingsOpen && e.key === 'Escape') {
-                e.preventDefault();
-                closeSettings();
-                return;
+            if (settingsOpen) {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    closeSettings();
+                    return;
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    applySettings();
+                    return;
+                }
             }
 
             // Check if results are showing (continue button visible)
