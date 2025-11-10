@@ -492,15 +492,27 @@
             height: 100vh;
             background: var(--bg-primary);
             border-left: 2px solid var(--border);
-            padding: 2rem;
-            overflow-y: auto;
             transition: right 0.3s ease;
             z-index: 1000;
             box-shadow: -4px 0 20px var(--shadow);
+            display: flex;
+            flex-direction: column;
         }
 
         .settings-panel.open {
             right: 0;
+        }
+
+        .settings-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .settings-footer {
+            padding: 1.5rem 2rem;
+            border-top: 2px solid var(--border);
+            background: var(--bg-primary);
         }
 
         .settings-header {
@@ -751,58 +763,60 @@
 
     <!-- Settings Panel -->
     <div class="settings-panel" id="settingsPanel">
-        <div class="settings-header">
-            <h2>Settings</h2>
-            <button class="secondary icon-only" id="closeSettingsBtn">✕</button>
+        <div class="settings-content">
+            <div class="settings-header">
+                <h2>Settings</h2>
+                <button class="secondary icon-only" id="closeSettingsBtn">✕</button>
+            </div>
+
+            <div class="setting-group">
+                <label for="testLengthSlider">
+                    Test Length: <span class="range-value" id="testLengthValue">40</span> chars
+                </label>
+                <div class="setting-description">Number of characters per test</div>
+                <input type="range" id="testLengthSlider" min="1" max="200" step="1" value="40">
+            </div>
+
+            <div class="setting-group">
+                <label for="newCharFreqSlider">
+                    New Character Frequency: <span class="range-value" id="newCharFreqValue">4</span>×
+                </label>
+                <div class="setting-description">How much more often new characters appear</div>
+                <input type="range" id="newCharFreqSlider" min="1" max="10" step="1" value="4">
+            </div>
+
+            <div class="setting-group">
+                <label for="livesSlider">
+                    Lives per Level: <span class="range-value" id="livesValue">3</span>
+                </label>
+                <div class="setting-description">Number of attempts before dropping a level</div>
+                <input type="range" id="livesSlider" min="1" max="5" step="1" value="3">
+            </div>
+
+            <div class="setting-group">
+                <label for="targetWpmSlider">
+                    Target WPM: <span class="range-value" id="targetWpmValue">10</span>
+                </label>
+                <div class="setting-description">Minimum WPM required to advance (0 = no time limit)</div>
+                <input type="range" id="targetWpmSlider" min="0" max="100" step="5" value="10">
+            </div>
+
+            <div class="setting-group">
+                <label for="accuracyThresholdSlider">
+                    Accuracy Threshold: <span class="range-value" id="accuracyThresholdValue">95</span>%
+                </label>
+                <div class="setting-description">Minimum accuracy to avoid losing a life (100% required to advance)</div>
+                <input type="range" id="accuracyThresholdSlider" min="0" max="100" step="1" value="95">
+            </div>
+
+            <div class="setting-group">
+                <label for="levelSelector">Jump to Level</label>
+                <div class="setting-description">Select any level to practice</div>
+                <select id="levelSelector"></select>
+            </div>
         </div>
 
-        <div class="setting-group">
-            <label for="testLengthSlider">
-                Test Length: <span class="range-value" id="testLengthValue">40</span> chars
-            </label>
-            <div class="setting-description">Number of characters per test</div>
-            <input type="range" id="testLengthSlider" min="1" max="200" step="1" value="40">
-        </div>
-
-        <div class="setting-group">
-            <label for="newCharFreqSlider">
-                New Character Frequency: <span class="range-value" id="newCharFreqValue">4</span>×
-            </label>
-            <div class="setting-description">How much more often new characters appear</div>
-            <input type="range" id="newCharFreqSlider" min="1" max="10" step="1" value="4">
-        </div>
-
-        <div class="setting-group">
-            <label for="livesSlider">
-                Lives per Level: <span class="range-value" id="livesValue">3</span>
-            </label>
-            <div class="setting-description">Number of attempts before dropping a level</div>
-            <input type="range" id="livesSlider" min="1" max="5" step="1" value="3">
-        </div>
-
-        <div class="setting-group">
-            <label for="targetWpmSlider">
-                Target WPM: <span class="range-value" id="targetWpmValue">10</span>
-            </label>
-            <div class="setting-description">Minimum WPM required to advance (0 = no time limit)</div>
-            <input type="range" id="targetWpmSlider" min="0" max="100" step="5" value="10">
-        </div>
-
-        <div class="setting-group">
-            <label for="accuracyThresholdSlider">
-                Accuracy Threshold: <span class="range-value" id="accuracyThresholdValue">95</span>%
-            </label>
-            <div class="setting-description">Minimum accuracy to avoid losing a life (100% required to advance)</div>
-            <input type="range" id="accuracyThresholdSlider" min="0" max="100" step="1" value="95">
-        </div>
-
-        <div class="setting-group">
-            <label for="levelSelector">Jump to Level</label>
-            <div class="setting-description">Select any level to practice</div>
-            <select id="levelSelector"></select>
-        </div>
-
-        <div class="setting-group">
+        <div class="settings-footer">
             <button id="applySettingsBtn" style="width: 100%;">
                 Apply Settings <span class="kbd">Enter</span>
             </button>

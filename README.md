@@ -115,7 +115,8 @@ Press **Space** to continue to the next test.
 |-----|--------|
 | **Space** or **Enter** | Start a test or continue after results |
 | **Enter** (during test) | Force fail and restart immediately |
-| **Esc** | Return to welcome screen |
+| **Enter** (in settings) | Apply settings and close panel |
+| **Esc** | Return to welcome screen or close settings |
 | **S** | Open/close settings |
 | **D** | Toggle dark mode |
 
@@ -134,7 +135,11 @@ Access settings by pressing **S** or clicking the ⚙️ icon.
 | **Accuracy Threshold** | 0-100% | 95% | Minimum accuracy to avoid losing a life |
 | **Level Selector** | Any level | 1 | Jump to any level for practice |
 
-**Note:** All settings are saved to browser localStorage and persist across sessions.
+**Applying Settings:**
+- After changing settings, click **Apply Settings** (or press **Enter**) to apply changes
+- The Apply button is always visible at the bottom of the settings panel
+- If a test is active, applying settings will restart it with the new configuration
+- Settings are automatically saved to browser localStorage and persist across sessions
 
 ## File Structure
 
