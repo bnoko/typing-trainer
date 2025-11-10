@@ -787,7 +787,7 @@
 
             <div class="setting-group">
                 <label for="livesSlider">
-                    Lives per Level: <span class="range-value" id="livesValue">3</span>
+                    Lives per Level: <span class="range-value" id="livesSettingValue">3</span>
                 </label>
                 <div class="setting-description">Number of attempts before dropping a level</div>
                 <input type="range" id="livesSlider" min="1" max="10" step="1" value="3">
@@ -1456,7 +1456,7 @@
             document.getElementById('newCharFreqValue').textContent = settings.newCharFreq;
 
             document.getElementById('livesSlider').value = settings.maxLives;
-            document.getElementById('livesValue').textContent = settings.maxLives;
+            document.getElementById('livesSettingValue').textContent = settings.maxLives;
 
             document.getElementById('targetWpmSlider').value = settings.targetWpm;
             document.getElementById('targetWpmValue').textContent = settings.targetWpm;
@@ -1547,7 +1547,7 @@
         document.getElementById('livesSlider').addEventListener('input', (e) => {
             if (!state.pendingSettings) return;
             state.pendingSettings.maxLives = parseInt(e.target.value);
-            document.getElementById('livesValue').textContent = state.pendingSettings.maxLives;
+            document.getElementById('livesSettingValue').textContent = state.pendingSettings.maxLives;
             updateSettingsButtonVisibility();
         });
 
